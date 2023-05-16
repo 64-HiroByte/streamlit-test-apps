@@ -1,0 +1,65 @@
+date_time,file_name,code,note
+2023-05-15_21:07,test.py,"import os
+from datetime import datetime
+
+import pandas as pd
+import streamlit as st
+
+current_dir = os.getcwd()
+files = [f for f in os.listdir(current_dir) if f.endswith('.py')]
+files.insert(0, '-----')
+
+CSV_FILE = 'study_records.csv'
+
+options = ['学習記録を残す', '学習記録を閲覧する']
+
+mode = st.selectbox('どちらかを選択してください', options=options)
+
+if mode == options[0]:
+    selected_file = st.selectbox(':memo:ファイルを選択してください', options=files)
+
+    if selected_file != files[0]:
+        if selected_file:
+            file_path = os.path.abspath(selected_file)
+            with open(file_path, 'r') as f:
+                code = f.read()
+                st.code(code, language='python')
+        note = st.text_area('学習した感想やメモを入力してください', height=300)
+        
+        if st.button('保存'):
+            formatted_datetime = datetime.now().strftime('%Y-%m-%d_%H:%M')
+            # data = {'date_time': formatted_datetime, 'file_name': [selected_file], 'note': [note]}
+            df = pd.DataFrame(
+                {
+                    'date_time': formatted_datetime,
+                    'file_name': selected_file,
+                    'code': code,
+                    'note': [note]
+                }
+            )
+            df.to_csv(CSV_FILE, index=False)
+            st.success('学習記録が保存されました')
+            
+elif mode == options[1]:
+    
+    if os.path.isfile(CSV_FILE):
+        df = pd.read_csv(CSV_FILE)
+        st.selectbox('閲覧するデータを選んで下さい', options=df['file_name'])
+        st.table(df)
+    else:
+        st.info('学習記録が存在しません')
+        ",TT
+2023-05-16_18:48,write.py,"import streamlit as st
+
+# 文字列
+st.write('Hello World')
+
+# 絵文字
+st.write(':smile:')
+
+# HTMLの許可
+st.write('<a href=""https://www.google.com/"">Google</a>', unsafe_allow_html=True)
+
+# cssスタイル
+st.write('<p style=""font-size:24px"">フォントサイズ 24px</p>', unsafe_allow_html=True)
+",追記機能を実装しました！
